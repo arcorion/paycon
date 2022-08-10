@@ -29,7 +29,6 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
     time_unit = None
     weekly_hours = None
     
-    # Using Anthon's SmartFormatter - check class at bottom
     parser = argparse.ArgumentParser(description= \
             "Converts pay value for different time units.  If no time unit "
             "passed, guesses unit based on 0-120 for hour, 120.01-12000 for "
