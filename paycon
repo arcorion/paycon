@@ -26,14 +26,13 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
     tuple in the shape "float value, unit string, float weekly hours"
     """
     value = 60000
-    time_unit = None
     weekly_hours = None
     
     parser = argparse.ArgumentParser(description= \
             "Converts pay value for different time units.  If no time unit "
             "passed, guesses unit based on 0-120 for hour, 120.01-12000 for "
             "month, and 12000.01+ for year.")
-    parser.add_argument('-t', '--time-unit', metavar='unit', type=str, nargs=1, \
+    parser.add_argument('-t', '--time-unit', metavar='unit', nargs=1, \
             help='time unit for the passed pay amount(s)')
     parser.add_argument('-e', '--weekly-hours', metavar='hours', type=float, nargs=1, \
             help='number of hours worked per week (default: 40)')
@@ -42,10 +41,26 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
     arguments = parser.parse_args()
     print(arguments)
 
+    # Pass time_unit from arguments
+    # time_unit is a list of strings
+    # So taking the zeroeth string and then the zeroeth character
+    time_unit = arguments.time_unit[0][0]
+
     # value is a required argument at the command level
     # since these are not, confirming assignment
     if time_unit == None:
         time_unit = autoselect_unit(value)
+    elif time_unit == 'h':
+        time_unit = 'hour'
+    elif time_unit == 'w':
+        time_unit = 'week'
+    elif time_unit == 'm':
+        time_unit = 'month'
+    elif time_unit == 'y':
+        time_unit = 'year'
+    else:
+        raise Exception(f"{time_unit} not valid.  Please use (h)our,"
+                        f" (w)eek, (m)onth, or (y)ear")
     if weekly_hours == None:
         weekly_hours = 40.0
 
