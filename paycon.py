@@ -37,7 +37,7 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
             help='time unit for the passed pay amount(s)')
     parser.add_argument('-w', '--working-hours', metavar='hours', type=float, nargs=1, \
             help='number of hours worked per week (default: 40)')
-    parser.add_argument('pay_rate', metavar='rate', type=float, nargs='+', \
+    parser.add_argument('pay_rate', metavar='rate', type=float, nargs=1, \
                         help='amount paid per time period')
     arguments = parser.parse_args()
 
@@ -127,7 +127,7 @@ def display(conversion: dict, time_unit: str, value: float, \
           f'working {working_hours} hours a week:')
     for key in conversion:
         key_value = conversion[key]
-        print(key + "ly: " + f'${key_value:,.2f}')
+        print(key + "ly:   \t" + f'${key_value:,.2f}')
 
 if __name__ == "__main__":
     main()
