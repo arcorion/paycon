@@ -7,23 +7,26 @@
 # If only a number is passed, returns a "best guess" of all 
 # conversions, assuming 0-120 (inc) is hourly, 120.01-12000 is monthly,
 # and all values above are yearly pay, based on first number passed.
-#
-# Usage: paycon [-h, --help] [-i, --in-unit hwmy] [-e, --WeeklyHours N] N [N..]
 
 import argparse
 
 def main():
-    """Take in arguments, handle conversions"""
-    arguments = process_arguments()
-    value = 60000 # Remove this later
-    in_unit = None # Remove this later
-    if in_unit == None:
-        in_unit = autoselect(value) # Chooses in-unit if none passed
-    conversion = convert(in_unit=in_unit, value=value)
-    display(conversion, in_unit, value)
+    """
+    Converts passed arguments to amount of pay for a list of
+    possible time units and displays results
+    """
+    value, time_unit, hours = process_arguments()
+    conversion = convert(time_unit, value, hours)
+    display(conversion, time_unit, value)
 
 def process_arguments() -> argparse.ArgumentParser.parse_args:
-    """Create the parser object based on arguments"""
+    """
+    Processes arguments for necessary conversions
+    Returns
+    tuple in the shape "float value, unit string, float weekly hours"
+    """
+    value = None
+    
     # Using Anthon's SmartFormatter - check class at bottom
     parser = argparse.ArgumentParser(description= \
             "Converts pay value for different time units.  If no time unit "
@@ -36,15 +39,21 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
     parser.add_argument('pay_rate', metavar='rate', type=float, nargs='+', \
                         help='amount paid per time period')
     arguments = parser.parse_args()
-    return arguments
+    print(arguments)
+    if time_unit = None:
+        time_unit = autoselect_unit(value)
+    if weekly_hours = None:
+        weekly_hours = 40.0
+    return 40.00, 'hour', 40.00 
 
-def convert(value: float, in_unit: str='hour', work_week: float=40,\
-            overtime: float=40) -> dict:
+def convert(value: float, time_unit: str='hour', work_week: float=40) -> dict:
     """Takes:
-        in_unit - input unit of time to be converted
+        time_unit- input unit of time to be converted
         value - value of time per input unit (pay)
         work_week - number of hours worked (per week)
-        overtime - number of hours above which overtime starts
+        Returns:
+        Dictionary of pay for each time unit, with units as keys
+        and pay amount as values.
     """
     # These variables will be necessary for later calculations
     # There are exactly 52 weeks and one day in a year
@@ -55,13 +64,13 @@ def convert(value: float, in_unit: str='hour', work_week: float=40,\
     hours_per_month = work_week * weeks_per_month
     
     # Determine hourly pay rate
-    if in_unit == 'hour':
+    if time_unit == 'hour':
         hourly = value
-    elif in_unit == 'week':
+    elif time_unit == 'week':
         hourly = value / work_week
-    elif in_unit == 'month':
+    elif time_unit == 'month':
         hourly = value / hours_per_month
-    elif in_unit == 'year':
+    elif time_unit == 'year':
         hourly = value / months_per_year / hours_per_month
     else:
         raise Exception("Not a valid time unit")
@@ -75,7 +84,7 @@ def convert(value: float, in_unit: str='hour', work_week: float=40,\
 
     return out_units
 
-def autoselect(value: float) -> str:
+def autoselect_unit(value: float) -> str:
     """
     Takes:
     value - pay amount
@@ -92,9 +101,9 @@ def autoselect(value: float) -> str:
     else:
         return 'year'
 
-def display(conversion: dict, in_unit: str, value: float, \
+def display(conversion: dict, time_unit: str, value: float, \
             out_units: str='dwmy') -> None:
-    print(f'Output for a {in_unit} at a pay rate of ${value}')
+    print(f'Output for a {time_unit} at a pay rate of ${value}')
     for key in conversion:
         key_value = conversion[key]
         print(key + "ly: " + f'${key_value:,.2f}')
