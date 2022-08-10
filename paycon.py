@@ -16,7 +16,7 @@ def main():
     possible time units and displays results
     """
     value, time_unit, hours = process_arguments()
-    conversion = convert(time_unit, value, hours)
+    conversion = convert(value, time_unit, hours)
     display(conversion, time_unit, value)
 
 def process_arguments() -> argparse.ArgumentParser.parse_args:
@@ -25,7 +25,9 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
     Returns
     tuple in the shape "float value, unit string, float weekly hours"
     """
-    value = None
+    value = 60000
+    time_unit = None
+    weekly_hours = None
     
     # Using Anthon's SmartFormatter - check class at bottom
     parser = argparse.ArgumentParser(description= \
@@ -40,11 +42,15 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
                         help='amount paid per time period')
     arguments = parser.parse_args()
     print(arguments)
-    if time_unit = None:
+
+    # value is a required argument at the command level
+    # since these are not, confirming assignment
+    if time_unit == None:
         time_unit = autoselect_unit(value)
-    if weekly_hours = None:
+    if weekly_hours == None:
         weekly_hours = 40.0
-    return 40.00, 'hour', 40.00 
+
+    return value, time_unit, weekly_hours
 
 def convert(value: float, time_unit: str='hour', work_week: float=40) -> dict:
     """Takes:
@@ -73,7 +79,7 @@ def convert(value: float, time_unit: str='hour', work_week: float=40) -> dict:
     elif time_unit == 'year':
         hourly = value / months_per_year / hours_per_month
     else:
-        raise Exception("Not a valid time unit")
+        raise Exception(f"Not a valid time unit: {time_unit}")
 
     # Create a lookup dictionary to calculate out unit from hourly rate
     out_units = {'hour': hourly,
