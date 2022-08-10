@@ -15,9 +15,13 @@ def main():
     Converts passed arguments to amount of pay for a list of
     possible time units and displays results
     """
-    value, time_unit, hours = process_arguments()
-    conversion = convert(value, time_unit, hours)
-    display(conversion, time_unit, value)
+    try:
+        value, time_unit, hours = process_arguments()
+    except Exception as e:
+        print(str(e))
+    else:
+        conversion = convert(value, time_unit, hours)
+        display(conversion, time_unit, value)
 
 def process_arguments() -> argparse.ArgumentParser.parse_args:
     """
@@ -25,46 +29,56 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
     Returns
     tuple in the shape "float value, unit string, float weekly hours"
     """
-    value = 60000
-    weekly_hours = None
-    
     parser = argparse.ArgumentParser(description= \
             "Converts pay value for different time units.  If no time unit "
             "passed, guesses unit based on 0-120 for hour, 120.01-12000 for "
             "month, and 12000.01+ for year.")
     parser.add_argument('-t', '--time-unit', metavar='unit', nargs=1, \
             help='time unit for the passed pay amount(s)')
-    parser.add_argument('-e', '--weekly-hours', metavar='hours', type=float, nargs=1, \
+    parser.add_argument('-w', '--working-hours', metavar='hours', type=float, nargs=1, \
             help='number of hours worked per week (default: 40)')
     parser.add_argument('pay_rate', metavar='rate', type=float, nargs='+', \
                         help='amount paid per time period')
     arguments = parser.parse_args()
-    print(arguments)
 
-    # Pass time_unit from arguments
-    # time_unit is a list of strings
-    # So taking the zeroeth string and then the zeroeth character
-    time_unit = arguments.time_unit[0][0]
+    #
+    # Assigning value
+    #
+    value = arguments.pay_rate[0]
+    
+    #
+    # Assigning time_unit
+    #
+    if arguments.time_unit is not None:
+        unit = arguments.time_unit[0]
+    else:
+        unit = None
 
     # value is a required argument at the command level
     # since these are not, confirming assignment
-    if time_unit == None:
+    if unit == None:
         time_unit = autoselect_unit(value)
-    elif time_unit == 'h':
+    elif unit[0] == 'h':
         time_unit = 'hour'
-    elif time_unit == 'w':
+    elif unit[0] == 'w':
         time_unit = 'week'
-    elif time_unit == 'm':
+    elif unit[0] == 'm':
         time_unit = 'month'
-    elif time_unit == 'y':
+    elif unit[0] == 'y':
         time_unit = 'year'
     else:
-        raise Exception(f"{time_unit} not valid.  Please use (h)our,"
+        raise Exception(f"{unit} not a valid time unit.  Please use (h)our,"
                         f" (w)eek, (m)onth, or (y)ear")
-    if weekly_hours == None:
-        weekly_hours = 40.0
+    
+    #
+    # Assigning weekly_hours
+    #
+    if arguments.working_hours is not None:
+        working_hours = arguments.working_hours[0]
+    else:
+        working_hours = 40.0
 
-    return value, time_unit, weekly_hours
+    return value, time_unit, working_hours
 
 def convert(value: float, time_unit: str='hour', work_week: float=40) -> dict:
     """Takes:
@@ -127,7 +141,6 @@ def display(conversion: dict, time_unit: str, value: float, \
     for key in conversion:
         key_value = conversion[key]
         print(key + "ly: " + f'${key_value:,.2f}')
-
 
 if __name__ == "__main__":
     main()
