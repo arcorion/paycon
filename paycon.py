@@ -29,15 +29,6 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
             "Converts pay value for different time units.  If no time unit "
             "passed, guesses unit based on 0-120 for hour, 120.01-12000 for "
             "month, and 12000.01+ for year.")
-
-    """
-            "$ paycon --time-unit year 60000\n"
-            "Output for a year at a pay rate of $60000.00\n"
-            "hourly: $28.77\n"
-            "weekly: $1,150.68\n"
-            "monthly: $5,000.00\n"
-            "yearly: $60,000.00\n", formatter_class=argparse.RawDescriptionHelpFormatter)
-    """
     parser.add_argument('-t', '--time-unit', metavar='unit', type=str, nargs=1, \
             help='time unit for the passed pay amount(s)')
     parser.add_argument('-e', '--weekly-hours', metavar='hours', type=float, nargs=1, \
