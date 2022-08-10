@@ -12,10 +12,9 @@
 
 import argparse
 
-
 def main():
     """Take in arguments, handle conversions"""
-    parser = create_parser()
+    arguments = process_arguments()
     value = 60000 # Remove this later
     in_unit = None # Remove this later
     if in_unit == None:
@@ -23,17 +22,30 @@ def main():
     conversion = convert(in_unit=in_unit, value=value)
     display(conversion, in_unit, value)
 
-def create_parser() -> argparse.ArgumentParser:
+def process_arguments() -> argparse.ArgumentParser.parse_args:
     """Create the parser object based on arguments"""
-    parser = argparse.ArgumentParser(description='Converts given pay' +
-                                 ' amounts between different time units.')
-    parser.add_argument('-i', '--in-unit', metavar='input-unit', type=str, nargs=1, \
-                        help='input time unit')
-    parser.add_argument('-e', '--WeeklyHours', metavar='hours', type=float, nargs=1, \
-                        help='number of hours worked per week')
-    parser.add_argument('pay_rate', metavar='rate', type=float, nargs='+',
-                        help='amount paid per given input unit')
-    return parser
+    # Using Anthon's SmartFormatter - check class at bottom
+    parser = argparse.ArgumentParser(description= \
+            "Converts pay value for different time units.  If no time unit "
+            "passed, guesses unit based on 0-120 for hour, 120.01-12000 for "
+            "month, and 12000.01+ for year.")
+
+    """
+            "$ paycon --time-unit year 60000\n"
+            "Output for a year at a pay rate of $60000.00\n"
+            "hourly: $28.77\n"
+            "weekly: $1,150.68\n"
+            "monthly: $5,000.00\n"
+            "yearly: $60,000.00\n", formatter_class=argparse.RawDescriptionHelpFormatter)
+    """
+    parser.add_argument('-t', '--time-unit', metavar='unit', type=str, nargs=1, \
+            help='time unit for the passed pay amount(s)')
+    parser.add_argument('-e', '--weekly-hours', metavar='hours', type=float, nargs=1, \
+            help='number of hours worked per week (default: 40)')
+    parser.add_argument('pay_rate', metavar='rate', type=float, nargs='+', \
+                        help='amount paid per time period')
+    arguments = parser.parse_args()
+    return arguments
 
 def convert(value: float, in_unit: str='hour', work_week: float=40,\
             overtime: float=40) -> dict:
@@ -91,10 +103,11 @@ def autoselect(value: float) -> str:
 
 def display(conversion: dict, in_unit: str, value: float, \
             out_units: str='dwmy') -> None:
-    print(f'Output for {in_unit} at ${value}')
+    print(f'Output for a {in_unit} at a pay rate of ${value}')
     for key in conversion:
         key_value = conversion[key]
-        print(key + ": " + f'${key_value:,.2f}')
+        print(key + "ly: " + f'${key_value:,.2f}')
+
 
 if __name__ == "__main__":
     main()
