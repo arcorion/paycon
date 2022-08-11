@@ -4,11 +4,12 @@
 # The output for month would be 20 * 40 * 4.3, or
 # 3440.00 for a month's pay.
 # If nothing is passed, returns help.
-# If only a number is passed, returns a "best guess" of all 
+# If only a number is passed, returns a "best guess" of all
 # conversions, assuming 0-120 (inc) is hourly, 120.01-12000 is monthly,
 # and all values above are yearly pay, based on first number passed.
 
 import argparse
+
 
 def main():
     """
@@ -18,9 +19,9 @@ def main():
     values, time_unit, hours = process_arguments()
     if time_unit == '':
         print("Invalid time unit.  Use (h)our, (w)eek, (m)onth),"
-                "or (y)ear.")
+              "or (y)ear.")
         return
-    
+
     # List of tuples, (value, conversion dict)
     conversions = []
     for value in values:
@@ -35,22 +36,23 @@ def process_arguments() -> tuple:
     Returns
     tuple in the shape "float value, unit string, float weekly hours"
     """
-    parser = argparse.ArgumentParser(description= \
-            "Converts pay value for different time units.  If no time unit "
-            "passed, guesses unit based on 0-120 for hour, 120.01-12000 for "
-            "month, and 12000.01+ for year.")
-    parser.add_argument('-t', '--time-unit', metavar='unit', nargs=1, \
-            help='time unit for the passed pay amount(s)')
-    parser.add_argument('-w', '--working-hours', metavar='hours', type=float, nargs=1, \
-            help='number of hours worked per week (default: 40)')
-    parser.add_argument('pay_rate', metavar='rate', type=float, nargs='+', \
+    parser = argparse.ArgumentParser(
+        description="Converts pay value for different time units.  If no time "
+                    "unit passed, guesses unit based on 0-120 for hour, "
+                    "120.01-12000 for month, and 12000.01+ for year.")
+    parser.add_argument('-t', '--time-unit', metavar='unit', nargs=1,
+                        help='time unit for the passed pay amount(s)')
+    parser.add_argument('-w', '--working-hours', metavar='hours', type=float,
+                        nargs=1,
+                        help='number of hours worked per week (default: 40)')
+    parser.add_argument('pay_rate', metavar='rate', type=float, nargs='+',
                         help='amount paid per time period')
     arguments = parser.parse_args()
 
     values = []
     for rate in arguments.pay_rate:
         values.append(rate)
-    
+
     if arguments.time_unit is None:
         time_unit = autoselect_unit(values[0])
     else:
@@ -66,7 +68,7 @@ def process_arguments() -> tuple:
             time_unit = 'year'
         else:
             time_unit = ''
-    
+
     if arguments.working_hours is not None:
         working_hours = arguments.working_hours[0]
     else:
@@ -74,7 +76,8 @@ def process_arguments() -> tuple:
 
     return values, time_unit, working_hours
 
-def convert(value: float, time_unit: str='hour', work_week: float=40) -> tuple:
+
+def convert(value: float, time_unit, work_week: float) -> tuple:
     """Takes:
         time_unit- input unit of time to be converted
         value - value of time per input unit (pay)
@@ -90,7 +93,7 @@ def convert(value: float, time_unit: str='hour', work_week: float=40) -> tuple:
     # This is an average - actual weeks per month varies
     weeks_per_month = weeks_per_year / months_per_year
     hours_per_month = work_week * weeks_per_month
-    
+
     # Determine hourly pay rate
     if time_unit == 'hour':
         hourly = value
@@ -107,10 +110,11 @@ def convert(value: float, time_unit: str='hour', work_week: float=40) -> tuple:
     out_units = {'hour': hourly,
                  'week': hourly * work_week,
                  'month': hourly * work_week * weeks_per_month,
-                 'year': hourly * months_per_year * \
-                      work_week * weeks_per_month}
+                 'year': hourly * months_per_year *
+                 work_week * weeks_per_month}
 
     return (value, out_units)
+
 
 def autoselect_unit(value: float) -> str:
     """
@@ -119,7 +123,7 @@ def autoselect_unit(value: float) -> str:
     Returns:
     String representing predicted type of in unit
     """
-    # If only a number is passed, returns a "best guess" of all 
+    # If only a number is passed, returns a "best guess" of all
     # conversions, assuming 0-120 (inc) is hourly, 120.01-12000 is monthly,
     # and all values above are yearly pay, based on first number passed.
     if value >= 0 and value <= 120:
@@ -129,28 +133,28 @@ def autoselect_unit(value: float) -> str:
     else:
         return 'year'
 
-def display(conversions: list, time_unit: str, working_hours: float) -> None:
-    print(f"Working {working_hours} hours a week, based on {time_unit}ly inputs:")
-    # Lines in order from title, hourly, weekly, monthly, yearly
-    lines = [f"in:  \t", f"hourly\t", f"weekly\t", f"monthly\t", f"yearly\t"]
 
-    # Make working_hours an int if whole
-    if str(working_hours).split('.')[1] == '0':
-        working_hours = int(working_hours)
+def display(conversions: list, time_unit: str, working_hours: float) -> None:
+    print(f"{working_hours} work weeks, with {time_unit}ly inputs:")
+    # Lines in order from title, hourly, weekly, monthly, yearly
+    lines = ["in:  \t", "hourly\t", "weekly\t", "monthly\t", "yearly\t"]
+
+    currency = '$'
 
     for conversion in conversions:
         value = conversion[0]
         amounts = conversion[1]
-        
-        lines[0] += f"${value:<20,.2f}"
-        
+
+        lines[0] += f"{currency}{value:<20,.2f}"
+
         next_line = 1
         for amount in amounts.values():
-            lines[next_line] += f"${amount:<20,.2f}"
+            lines[next_line] += f"{currency}{amount:<20,.2f}"
             next_line += 1
 
     for line in lines:
         print(line)
+
 
 if __name__ == "__main__":
     main()
