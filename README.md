@@ -3,17 +3,17 @@ Pay converter - converts pay amounts between different time units
 
 ## Installation/Requirements
 
-To install, you can either clone this package or just download the paycon.py file.  Usage is typically:
+To install, you can either clone this package or just download the paycon.py file.  Usage is typically something like:
 
-    python paycon.py
+    python paycon.py 40000
     
     or
 
-    python3 paycon.py
+    python3 paycon.py 30
     
     or
     
-    ./paycon.py
+    ./paycon.py -w 20 -t h 18
 
 If running on a Linux system, you'll need to make the program executable.
 
