@@ -3,6 +3,8 @@ Pay converter - converts pay amounts between different time units
 
 ## Help
 
+    usage: paycon.py [-h] [-t unit] [-w hours] rate [rate ...]
+    
     Converts pay value for different time units. If no time unit passed, guesses unit based on 0-120 for hour,
     120.01-12000 for month, and 12000.01+ for year.
     
@@ -15,3 +17,21 @@ Pay converter - converts pay amounts between different time units
                             time unit for the passed pay amount(s)
       -w hours, --working-hours hours
                             number of hours worked per week (default: 40)
+
+## Usage examples
+
+    $ ./paycon.py -w 30 -t h 30 40
+    Working 30.0 hours a week, based on hourly inputs:
+    in:  	$30.00               $40.00
+    hourly	$30.00               $40.00
+    weekly	$900.00              $1,200.00
+    monthly	$3,910.71            $5,214.29
+    yearly	$46,928.57           $62,571.43
+
+    $ ./paycon.py 10000000
+    Working 40.0 hours a week, based on yearly inputs:
+    in:  	$10,000,000.00
+    hourly	$4,794.52
+    weekly	$191,780.82
+    monthly	$833,333.33
+    yearly	$10,000,000.00
