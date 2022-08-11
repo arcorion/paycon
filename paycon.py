@@ -15,15 +15,21 @@ def main():
     Converts passed arguments to amount of pay for a list of
     possible time units and displays results
     """
-    value, time_unit, hours = process_arguments()
+    values, time_unit, hours = process_arguments()
     if time_unit == '':
         print("Invalid time unit.  Use (h)our, (w)eek, (m)onth),"
                 "or (y)ear.")
         return
-    conversion = convert(value, time_unit, hours)
-    display(conversion, time_unit, value, hours)
+    
+    # List of tuples, (value, conversion dict)
+    conversions = []
+    for value in values:
+        conversions.append(convert(value, time_unit, hours))
 
-def process_arguments() -> argparse.ArgumentParser.parse_args:
+    display(conversions, time_unit, hours)
+
+
+def process_arguments() -> tuple:
     """
     Processes arguments for necessary conversions
     Returns
@@ -37,14 +43,16 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
             help='time unit for the passed pay amount(s)')
     parser.add_argument('-w', '--working-hours', metavar='hours', type=float, nargs=1, \
             help='number of hours worked per week (default: 40)')
-    parser.add_argument('pay_rate', metavar='rate', type=float, nargs=1, \
+    parser.add_argument('pay_rate', metavar='rate', type=float, nargs='+', \
                         help='amount paid per time period')
     arguments = parser.parse_args()
 
-    value = arguments.pay_rate[0]
+    values = []
+    for rate in arguments.pay_rate:
+        values.append(rate)
     
     if arguments.time_unit is None:
-        time_unit = autoselect_unit(value)
+        time_unit = autoselect_unit(values[0])
     else:
         time_unit = arguments.time_unit[0]
 
@@ -64,16 +72,16 @@ def process_arguments() -> argparse.ArgumentParser.parse_args:
     else:
         working_hours = 40.0
 
-    return value, time_unit, working_hours
+    return values, time_unit, working_hours
 
-def convert(value: float, time_unit: str='hour', work_week: float=40) -> dict:
+def convert(value: float, time_unit: str='hour', work_week: float=40) -> tuple:
     """Takes:
         time_unit- input unit of time to be converted
         value - value of time per input unit (pay)
         work_week - number of hours worked (per week)
         Returns:
-        Dictionary of pay for each time unit, with units as keys
-        and pay amount as values.
+        A tuple with the original value as the zeroeth element and a
+        dictionary of units as keys and pay amount as values as the second.
     """
     # These variables will be necessary for later calculations
     # There are exactly 52 weeks and one day in a year
@@ -102,7 +110,7 @@ def convert(value: float, time_unit: str='hour', work_week: float=40) -> dict:
                  'year': hourly * months_per_year * \
                       work_week * weeks_per_month}
 
-    return out_units
+    return (value, out_units)
 
 def autoselect_unit(value: float) -> str:
     """
@@ -121,13 +129,28 @@ def autoselect_unit(value: float) -> str:
     else:
         return 'year'
 
-def display(conversion: dict, time_unit: str, value: float, \
-            working_hours: float) -> None:
-    print(f'At a pay rate of ${value:,.2f} each {time_unit},',
-          f'working {working_hours} hours a week:')
-    for key in conversion:
-        key_value = conversion[key]
-        print(key + "ly:   \t" + f'${key_value:,.2f}')
+def display(conversions: list, time_unit: str, working_hours: float) -> None:
+    print(f"Working {working_hours} hours a week, based on {time_unit}ly inputs:")
+    # Lines in order from title, hourly, weekly, monthly, yearly
+    lines = [f"in:  \t", f"hourly\t", f"weekly\t", f"monthly\t", f"yearly\t"]
+
+    # Make working_hours an int if whole
+    if str(working_hours).split('.')[1] == '0':
+        working_hours = int(working_hours)
+
+    for conversion in conversions:
+        value = conversion[0]
+        amounts = conversion[1]
+        
+        lines[0] += f"${value:<20,.2f}"
+        
+        next_line = 1
+        for amount in amounts.values():
+            lines[next_line] += f"${amount:<20,.2f}"
+            next_line += 1
+
+    for line in lines:
+        print(line)
 
 if __name__ == "__main__":
     main()
