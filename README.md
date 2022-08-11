@@ -1,7 +1,7 @@
 # paycon
 Pay converter - converts pay amounts between different time units
 
-# Installation/Requirements
+## Installation/Requirements
 
 To install, you can either clone this package or just download the paycon.py file.  Usage is typically:
 
