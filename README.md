@@ -19,7 +19,7 @@ If running on a Linux system, you'll need to make the program executable.
 
     chmod +x paycon.py
 
-Unfortunately, I don't have a Windows system, so I can't give specific Windows instruction and cannot be sure of behavior, but I believe it should work fine in Windows.
+In a Windows system, you can just run "python paycon.py" or "python3 paycon.py".
 
 The only requirement for paycon is [Python 3](https://www.python.org/downloads/).
 
