@@ -78,13 +78,14 @@ def process_arguments() -> tuple:
 
 
 def convert(value: float, time_unit, work_week: float) -> tuple:
-    """Takes:
-        time_unit- input unit of time to be converted
-        value - value of time per input unit (pay)
-        work_week - number of hours worked (per week)
-        Returns:
-        A tuple with the original value as the zeroeth element and a
-        dictionary of units as keys and pay amount as values as the second.
+    """
+    Takes:
+    time_unit- input unit of time to be converted
+    value - value of time per input unit (pay)
+    work_week - number of hours worked (per week)
+    Returns:
+    A tuple with the original value as the zeroeth element and a
+    dictionary of units as keys and pay amount as values as the second.
     """
     # These variables will be necessary for later calculations
     # There are exactly 52 weeks and one day in a year
@@ -135,6 +136,14 @@ def autoselect_unit(value: float) -> str:
 
 
 def display(conversions: list, time_unit: str, working_hours: float) -> None:
+    """
+    Takes:
+    conversions - a list of tuples made up of a value type and a dictionary of conversions
+    time_unit - a string representing the unit of time being displayed
+    working_house - a float representing the number of hours worked each week
+    Returns:
+    nothing - a display function
+    """
     print(f"{working_hours} work weeks, with {time_unit}ly inputs:")
     # Lines in order from title, hourly, weekly, monthly, yearly
     lines = ["in:  \t", "hourly\t", "weekly\t", "monthly\t", "yearly\t"]
